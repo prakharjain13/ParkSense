@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ParkSense Attendant Hub — real-time spot availability, vehicle check-in/out, and session log management.">
+  <title>ParkSense — Attendant Hub</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" type="image/png" href="/img/logo.png">
+</head>
+<body>
+
+  <!-- Persistent Multi-Page Navigation Bar -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="/dashboard.html" class="navbar-brand">
+        <img src="/img/logo.png" alt="ParkSense Logo" class="brand-logo-img">
+      </a>
+
+      <div class="navbar-links">
+        <a href="/" data-i18n="nav_home">Home</a>
+        <a href="/map.html" data-i18n="nav_live_map">Live Spot Map</a>
+        <a href="/rates.html" data-i18n="nav_rates">Rates &amp; Estimator</a>
+        <a href="/dashboard.html" class="active" data-i18n="nav_attendant_hub">Attendant Hub</a>
+      </div>
+
+      <!-- Global Plate Search -->
+      <div style="position: relative; flex: 0 1 280px;">
+        <div style="position: relative;">
+          <input 
+            type="text" 
+            id="globalPlateSearch" 
+            class="neu-input plate-input" 
+            placeholder="Search plate..."
+            style="font-size: 0.88rem; padding: 8px 14px 8px 38px; letter-spacing: 1px;"
+          >
+          <svg class="icon icon-sm" viewBox="0 0 24 24" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary);"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </div>
+        <div id="globalSearchResults" class="hidden" style="
+          position: absolute; top: calc(100% + 8px); left: 0; right: 0; 
+          background: var(--bg-surface); border-radius: var(--radius-md); 
+          border: 1px solid var(--border-color);
+          box-shadow: var(--shadow-lg); z-index: 200; max-height: 400px; overflow-y: auto;
+        "></div>
+      </div>
+
+      <div class="navbar-user">
+        <div class="user-avatar" id="userAvatar">A</div>
+        <span id="userName" class="text-sm" style="font-weight: 700; font-family: var(--font-section);"></span>
+        <button id="logoutBtn" class="neu-btn neu-btn-sm neu-btn-red" data-i18n="nav_logout">Logout</button>
+
+        <!-- Language Switcher -->
+        <div class="lang-switcher">
+          <button id="langEnBtn" class="lang-btn active">EN</button>
+          <button id="langHiBtn" class="lang-btn">हिंदी</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container dashboard-page">
+
+    <!-- AVAILABILITY CARDS SECTION -->
+    <section class="availability-section" style="margin-bottom: 36px;">
+      <div class="section-header">
+        <svg class="icon icon-lg" viewBox="0 0 24 24" style="color: var(--accent-red);"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+        <h2 data-i18n="dash_avail_title">Real-Time Availability Summary</h2>
+      </div>
+
+      <div class="availability-grid">
+        <!-- Compact -->
+        <div class="availability-card type-compact">
+          <div class="card-type-label">
+            <svg class="icon icon-sm" viewBox="0 0 24 24" style="color: #ffffff;"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9C2.1 11.2 2 11.6 2 12v4c0 .6.4 1 1 1h2"></path><circle cx="7" cy="17" r="2"></circle><circle cx="17" cy="17" r="2"></circle></svg>
+            <span data-i18n="label_compact_bays">Compact Bays</span>
+          </div>
+          <div class="free-count" id="compactFree">—</div>
+          <div class="total-label" id="compactTotal">loading...</div>
+          <div class="spot-bar"><div class="spot-bar-fill" id="compactBar" style="width: 0%;"></div></div>
+        </div>
+
+        <!-- Standard -->
+        <div class="availability-card type-standard">
+          <div class="card-type-label">
+            <svg class="icon icon-sm" viewBox="0 0 24 24" style="color: var(--accent-red);"><rect x="1" y="6" width="22" height="12" rx="2"></rect><circle cx="6" cy="18" r="2"></circle><circle cx="18" cy="18" r="2"></circle></svg>
+            <span data-i18n="label_standard_bays">Standard Bays</span>
+          </div>
+          <div class="free-count" id="standardFree">—</div>
+          <div class="total-label" id="standardTotal">loading...</div>
+          <div class="spot-bar"><div class="spot-bar-fill" id="standardBar" style="width: 0%;"></div></div>
+        </div>
+
+        <!-- EV -->
+        <div class="availability-card type-ev">
+          <div class="card-type-label">
+            <svg class="icon icon-sm" viewBox="0 0 24 24" style="color: var(--accent-green);"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            <span data-i18n="label_ev_bays">EV Charger Bays</span>
+          </div>
+          <div class="free-count" id="evFree">—</div>
+          <div class="total-label" id="evTotal">loading...</div>
+          <div class="spot-bar"><div class="spot-bar-fill" id="evBar" style="width: 0%;"></div></div>
+        </div>
+      </div>
+
+      <div class="availability-grand text-center" style="margin-top: 20px;" id="grandAvailability">
+        Loading availability summary...
+      </div>
+    </section>
+
+    <!-- LIVE SPOT MAP PREVIEW -->
+    <section class="spot-map-section">
+      <div class="section-header" style="justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <svg class="icon icon-lg" viewBox="0 0 24 24" style="color: var(--accent-red);"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+          <h2 data-i18n="dash_live_map_title">Live Garage Spot Map</h2>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <a href="/map.html" class="neu-btn neu-btn-sm" style="font-size: 0.82rem;">Full Map Page &rarr;</a>
+          <button id="refreshMapBtn" class="neu-btn neu-btn-red neu-btn-sm" data-i18n="btn_refresh_map">Refresh</button>
+        </div>
+      </div>
+
+      <div class="level-tabs" id="levelTabs">
+        <!-- JS dynamically populates Level 1, Level 2, Level 3 -->
+      </div>
+
+      <div class="spot-grid" id="spotGrid">
+        <div class="text-center text-muted" style="grid-column: 1 / -1; padding: 40px;">
+          Loading spot map...
+        </div>
+      </div>
+    </section>
+
+    <!-- CHECK-IN / CHECK-OUT PANELS -->
+    <section class="ops-grid">
+      <!-- Check-In Panel -->
+      <div class="ops-panel checkin-panel">
+        <h3>
+          <svg class="icon icon-lg" viewBox="0 0 24 24" style="color: #ffffff;"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+          <span data-i18n="dash_checkin_title">Vehicle Check-In</span>
+        </h3>
+        <form id="checkinForm">
+          <div class="form-group">
+            <label class="neu-label" for="checkinPlate" data-i18n="label_license_plate">License Plate Number</label>
+            <input 
+              type="text" 
+              id="checkinPlate" 
+              class="neu-input plate-input" 
+              placeholder="e.g. MH 01 AB 1234"
+              required
+            >
+          </div>
+          <div class="form-group">
+            <label class="neu-label" for="checkinVehicleType" data-i18n="label_vehicle_category">Vehicle Category</label>
+            <select id="checkinVehicleType" class="neu-select" required>
+              <option value="">Select vehicle category...</option>
+              <option value="compact" data-i18n="opt_compact">Compact Car</option>
+              <option value="standard" data-i18n="opt_standard">Standard Car / SUV</option>
+              <option value="ev" data-i18n="opt_ev">Electric Vehicle (EV Charger Bay)</option>
+            </select>
+          </div>
+          <button type="submit" class="neu-btn neu-btn-red" style="width: 100%; display: flex; justify-content: center; align-items: center; gap: 8px;">
+            <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+            <span data-i18n="btn_checkin_submit">Assign Spot &amp; Check In</span>
+          </button>
+        </form>
+        <div id="checkinResult" class="ops-result"></div>
+      </div>
+
+      <!-- Check-Out Panel -->
+      <div class="ops-panel checkout-panel">
+        <h3>
+          <svg class="icon icon-lg" viewBox="0 0 24 24" style="color: var(--accent-red);"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+          <span data-i18n="dash_checkout_title">Vehicle Check-Out</span>
+        </h3>
+        <div class="form-group">
+          <label class="neu-label" for="checkoutSearchInput" data-i18n="label_search_active">Search Active Vehicle by Plate</label>
+          <input 
+            type="text" 
+            id="checkoutSearchInput" 
+            class="neu-input plate-input" 
+            placeholder="Type plate to find active session..."
+            data-i18n-placeholder="ph_search_plate"
+          >
+        </div>
+        <div id="checkoutSearchResults" class="checkout-search-results"></div>
+        <div id="checkoutResult" class="ops-result"></div>
+      </div>
+    </section>
+
+    <!-- SESSION LOG SECTION -->
+    <section class="session-log-section">
+      <div class="log-header">
+        <div class="section-header" style="margin-bottom: 0;">
+          <svg class="icon icon-lg" viewBox="0 0 24 24" style="color: var(--accent-red);"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+          <h2 data-i18n="dash_log_title">Parking Session Log</h2>
+        </div>
+
+        <div class="log-filters" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+          <button id="btnRunClock" class="neu-btn neu-btn-sm" style="background: rgba(239, 68, 68, 0.15); border: 1px solid var(--accent-red); color: var(--accent-red); font-weight: 700; font-size: 0.8rem;" data-i18n="btn_run_clock">
+            Run Nightly 24h Auto-Close (POST /clock)
+          </button>
+          <input 
+            type="text" 
+            id="logPlateSearch" 
+            class="neu-input" 
+            placeholder="Filter by plate..."
+            data-i18n-placeholder="ph_filter_plate"
+            style="max-width: 160px;"
+          >
+          <select id="filterStatus" class="neu-select">
+            <option value="" data-i18n="opt_all_status">All Status</option>
+            <option value="active" data-i18n="opt_active_sessions">Active Sessions</option>
+            <option value="completed" data-i18n="opt_completed_sessions">Completed Sessions</option>
+            <option value="auto-closed" data-i18n="opt_autoclosed_sessions">Auto-Closed (Nightly 24h)</option>
+          </select>
+          <select id="filterVehicleType" class="neu-select">
+            <option value="" data-i18n="opt_all_categories">All Categories</option>
+            <option value="compact" data-i18n="opt_compact">Compact</option>
+            <option value="standard" data-i18n="opt_standard">Standard</option>
+            <option value="ev" data-i18n="opt_ev">EV</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="session-table">
+          <thead>
+            <tr>
+              <th data-sort="plate"><span data-i18n="col_plate">Plate</span> <span class="sort-arrow"></span></th>
+              <th data-i18n="col_category">Category</th>
+              <th data-i18n="col_spot">Spot Bay</th>
+              <th data-sort="check_in_time"><span data-i18n="col_checkin">Check In</span> <span class="sort-arrow"></span></th>
+              <th data-sort="check_out_time"><span data-i18n="col_checkout">Check Out</span> <span class="sort-arrow"></span></th>
+              <th data-sort="fee"><span data-i18n="col_fee">Fee</span> <span class="sort-arrow"></span></th>
+              <th data-sort="status"><span data-i18n="col_status">Status</span> <span class="sort-arrow"></span></th>
+              <th data-i18n="col_action">Action</th>
+            </tr>
+          </thead>
+          <tbody id="sessionTableBody">
+            <tr>
+              <td colspan="8" class="text-center text-muted" style="padding: 40px;">
+                Loading session log...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="pagination">
+          <div class="pagination-info" id="paginationInfo">Loading...</div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <label class="text-sm text-muted" style="white-space: nowrap; font-family: var(--font-mono);">
+              Rows:
+              <select id="pageSize" class="page-size-select" style="padding: 4px 8px; border-radius: 4px; background: var(--bg-input); color: var(--text-primary); border: 1px solid var(--border-color);">
+                <option value="5">5</option>
+                <option value="10" selected>10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </label>
+            <div class="pagination-controls" id="paginationControls"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- LEVEL 3 — T6 VALET PLATE TRANSFER MODAL -->
+  <div id="transferModal" class="hidden" style="
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(8px);
+    z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px;
+  ">
+    <div class="neu-card" style="width: 100%; max-width: 480px; position: relative;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="font-family: var(--font-section); font-size: 1.4rem; color: var(--text-primary);" data-i18n="modal_transfer_title">Valet Hand-off Plate Transfer (Level 3 — T6)</h3>
+        <button id="closeTransferModal" style="background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer;">&times;</button>
+      </div>
+
+      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;" data-i18n="modal_transfer_subtitle">
+        Transfer an open parking session to a replacement vehicle plate. Spot bay allocation and original entry timestamp carry over intact.
+      </p>
+
+      <form id="transferForm">
+        <input type="hidden" id="transferSessionId">
+        
+        <div class="form-group">
+          <label class="neu-label">Current License Plate</label>
+          <input type="text" id="transferOldPlate" class="neu-input plate-input" readonly style="opacity: 0.7; background: rgba(255, 255, 255, 0.04);">
+        </div>
+
+        <div class="form-group">
+          <label class="neu-label" for="transferNewPlate" data-i18n="label_new_plate">Replacement Vehicle License Plate</label>
+          <input type="text" id="transferNewPlate" class="neu-input plate-input" placeholder="e.g. KA 05 MC 9999" required>
+        </div>
+
+        <div class="form-group">
+          <label class="neu-label" for="transferReason" data-i18n="label_transfer_reason">Hand-off Reason / Notes</label>
+          <input type="text" id="transferReason" class="neu-input" placeholder="e.g. Valet Key Hand-off / Owner Vehicle Swap" value="Valet Hand-off">
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-top: 24px;">
+          <button type="button" id="cancelTransferBtn" class="neu-btn" style="flex: 1; justify-content: center;">Cancel</button>
+          <button type="submit" class="neu-btn neu-btn-red" style="flex: 1; justify-content: center;" data-i18n="btn_confirm_transfer">Confirm Transfer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/i18n.js"></script>
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

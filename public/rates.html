@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ParkSense — Garage Rates & Interactive Fee Estimator. Transparent tiered pricing rules.">
+  <title>ParkSense — Rates &amp; Interactive Fee Estimator</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" type="image/png" href="/img/logo.png">
+</head>
+<body>
+
+  <!-- Persistent Multi-Page Navigation Bar -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="/" class="navbar-brand">
+        <img src="/img/logo.png" alt="ParkSense Logo" class="brand-logo-img">
+      </a>
+      <div class="navbar-links">
+        <a href="/" data-i18n="nav_home">Home</a>
+        <a href="/map.html" data-i18n="nav_live_map">Live Spot Map</a>
+        <a href="/rates.html" class="active" data-i18n="nav_rates">Rates &amp; Estimator</a>
+        <a href="/dashboard.html" data-i18n="nav_attendant_hub">Attendant Hub</a>
+        <a href="/login.html" class="neu-btn neu-btn-red neu-btn-sm" data-i18n="nav_sign_in">Sign In</a>
+
+        <!-- Language Switcher -->
+        <div class="lang-switcher">
+          <button id="langEnBtn" class="lang-btn active">EN</button>
+          <button id="langHiBtn" class="lang-btn">हिंदी</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container dashboard-page">
+
+    <div style="text-align: center; max-width: 760px; margin: 0 auto 48px auto;">
+      <h1 style="font-family: var(--font-display); font-size: 2.8rem; font-weight: 900; letter-spacing: -1px; margin-bottom: 14px;" data-i18n="rates_page_title">Garage Rates &amp; Fee Estimator</h1>
+      <p style="color: var(--text-secondary); font-size: 1.15rem;" data-i18n="rates_page_subtitle">
+        Guaranteed transparent pricing. Tiered hourly rates with automated 24-hour daily maximum caps. Zero hidden fees.
+      </p>
+    </div>
+
+    <!-- INTERACTIVE FEE ESTIMATOR WIDGET -->
+    <div class="calculator-widget" style="margin-bottom: 48px;">
+      <div style="text-align: center; margin-bottom: 32px;">
+        <h2 style="font-family: var(--font-section); font-size: 1.9rem; font-weight: 800;" data-i18n="calc_widget_title">Interactive Stay Calculator</h2>
+        <p style="color: var(--text-secondary);" data-i18n="calc_widget_subtitle">Select vehicle category and stay duration to compute exact fee</p>
+      </div>
+
+      <div class="calc-grid">
+        <div>
+          <div class="form-group">
+            <label class="neu-label" for="calcVehicleType" data-i18n="label_vehicle_category">Vehicle Category</label>
+            <select id="calcVehicleType" class="neu-select">
+              <option value="compact" data-i18n="opt_compact">Compact Car</option>
+              <option value="standard" selected data-i18n="opt_standard">Standard Car / SUV</option>
+              <option value="ev" data-i18n="opt_ev">Electric Vehicle (EV Charger Bay)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="neu-label" for="calcHours" data-i18n="label_stay_duration">Stay Duration (Hours)</label>
+            <input type="number" id="calcHours" class="neu-input" value="4" min="1" max="168">
+          </div>
+
+          <div id="rateSummaryBox" style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted); line-height: 1.6;">
+            &bull; First Hour: ₹40 flat<br>
+            &bull; Additional Hours: ₹20 / hr<br>
+            &bull; Daily Cap: Maximum ₹200 per 24-hour block
+          </div>
+        </div>
+
+        <div class="calc-display">
+          <div style="font-family: var(--font-section); font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;" data-i18n="label_calculated_fee">Calculated Fee</div>
+          <div class="calc-amount" id="calcFeeAmount">₹100</div>
+          <div id="calcBreakdown" style="font-family: var(--font-mono); font-size: 0.9rem; color: var(--text-secondary);">First hour ₹40 + 3 extra hours &times; ₹20</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LEVEL 1 — T4 MESSY RATE CARD SANITIZER MODULE -->
+    <div class="neu-card" style="margin-bottom: 48px; border-left: 4px solid var(--accent-red);">
+      <div style="margin-bottom: 20px;">
+        <h3 style="font-family: var(--font-section); font-size: 1.5rem; font-weight: 800; color: var(--text-primary); margin-bottom: 6px;" data-i18n="messy_rates_title">Messy Rate Card Sanitizer (Level 1 — T4)</h3>
+        <p style="color: var(--text-secondary); font-size: 0.95rem;" data-i18n="messy_rates_subtitle">
+          Paste raw messy rate cards containing noise symbols (e.g. ₹40/1st hr!, 20 RS extra, CAP: 200 INR). The system cleans and activates per-spot-type rates automatically.
+        </p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+        <div>
+          <label class="neu-label" for="messyCardInput" data-i18n="label_messy_input">Raw Unstructured Rate Card Text</label>
+          <textarea id="messyCardInput" class="neu-input" rows="6" style="font-family: var(--font-mono); font-size: 0.88rem; line-height: 1.5;" placeholder="COMPACT: 1st=30 RS, extra=15 RS, cap=150 INR!&#10;STANDARD: 1st=40 Rs, extra=20 Rs, cap=200 INR&#10;EV: 1st=50 INR, extra=25 RS, cap=250 INR! [CHARGER]">COMPACT: first = 30 RS, extra = 15 RS, cap = 150 INR!
+STANDARD: 1st hr = 40 Rs, extra = 20 Rs, 24h cap = 200 INR
+EV: 1st = 50 INR, extra = 25 RS, daily cap = 250 INR! [FAST CHARGER]</textarea>
+          <button id="btnCleanRates" class="neu-btn neu-btn-red" style="margin-top: 14px; width: 100%; justify-content: center;" data-i18n="btn_clean_rates">Sanitize &amp; Activate Rates</button>
+        </div>
+
+        <div>
+          <label class="neu-label" data-i18n="label_clean_diff">Sanitization Audit Diff Log</label>
+          <div id="messyDiffOutput" style="background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 16px; font-family: var(--font-mono); font-size: 0.82rem; color: #a1a1aa; height: 190px; overflow-y: auto; line-height: 1.6;">
+            <div style="color: var(--accent-red); font-weight: 700;">[STANDBY] Click 'Sanitize & Activate Rates' to clean raw rate card input.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RATE SCHEDULE TABLE -->
+    <div class="neu-card" style="margin-bottom: 44px;">
+      <h3 style="font-family: var(--font-section); font-size: 1.4rem; font-weight: 800; margin-bottom: 24px;" data-i18n="rates_schedule_title">Official Rate Schedule</h3>
+      
+      <div id="pricingRates">
+        <div class="text-center text-muted">Loading official rate schedule...</div>
+      </div>
+    </div>
+
+    <!-- POLICY RULES GRID -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+      <div class="neu-card">
+        <h4 style="font-family: var(--font-section); color: var(--accent-red); font-size: 1.15rem; margin-bottom: 10px;" data-i18n="rule1_title">1. Partial Hour Rounding</h4>
+        <p style="color: var(--text-secondary); font-size: 0.92rem;" data-i18n="rule1_desc">
+          Any portion of an hour (e.g. 15 minutes or 1 hour 10 minutes) rounds up to the next full hour block to ensure clear, predictable billing.
+        </p>
+      </div>
+
+      <div class="neu-card">
+        <h4 style="font-family: var(--font-section); color: var(--accent-red); font-size: 1.15rem; margin-bottom: 10px;" data-i18n="rule2_title">2. Daily Cap Protection</h4>
+        <p style="color: var(--text-secondary); font-size: 0.92rem;" data-i18n="rule2_desc">
+          No matter how many extra hours a vehicle stays in a 24-hour period, the total fee for that 24-hour block will never exceed the ₹200 daily cap.
+        </p>
+      </div>
+
+      <div class="neu-card">
+        <h4 style="font-family: var(--font-section); color: var(--accent-red); font-size: 1.15rem; margin-bottom: 10px;" data-i18n="rule3_title">3. EV Charger Allocation</h4>
+        <p style="color: var(--text-secondary); font-size: 0.92rem;" data-i18n="rule3_desc">
+          Electric vehicles are exclusively routed to Level 1 EV Charger bays (L1-E01 to L1-E15) to guarantee charging access upon arrival.
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer style="background: var(--bg-surface); border-top: 1px solid var(--border-color); text-align: center; padding: 40px 0; color: var(--text-muted); font-size: 0.9rem; margin-top: 60px;">
+    <p>ParkSense Management System &copy; 2026. Rates &amp; Policy Portal.</p>
+  </footer>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/i18n.js"></script>
+  <script src="/js/landing.js"></script>
+</body>
+</html>
