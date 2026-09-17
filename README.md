@@ -80,7 +80,7 @@ npm install
 npm start
 ```
 
-The server starts at **http://localhost:3000** with database auto-initialized and 75 parking spots seeded across 3 levels.
+The server starts at **https://parking-project-weld.vercel.app/** with database auto-initialized and 75 parking spots seeded across 3 levels.
 
 ---
 
